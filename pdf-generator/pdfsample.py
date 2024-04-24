@@ -52,7 +52,7 @@ zin = """Dit is een zin in de factuur.
 artikelomschrijving = "Artikelomschrijving"
 aantal = "Aantal"
 prijs = "Prijs"
-totaalprijs = "totaalprijs"
+totaalprijs = "Totaalprijs"
 
 # Image = 
 
