@@ -1,59 +1,79 @@
-#Ter inspiratie
-
-from reportlab.lib.pagesizes import A4
+import json
 from reportlab.pdfgen import canvas
-from PyPDF2 import PdfFileWriter, PdfFileReader
 
-def generate_blank_invoice(output_filename):
-    # Create a blank PDF
-    c = canvas.Canvas(output_filename, pagesize=A4)
+def drawMyRuler(pdf):
+    pdf.drawString(100,810, "x100")
+    pdf.drawString(200,810, "x200")
+    pdf.drawString(300,810, "x300")
+    pdf.drawString(400,810, "x400")
+    pdf.drawString(500,810, "x500")
 
-    # Set up the font and font size
-    c.setFont("Helvetica", 12)
+    pdf.drawString(10,100, "y100")
+    pdf.drawString(10,200, "y200")
+    pdf.drawString(10,300, "y300")
+    pdf.drawString(10,400, "y400")
+    pdf.drawString(10,500, "y500")
+    pdf.drawString(10,600, "y600")
+    pdf.drawString(10,700, "y700")
+    pdf.drawString(10,800, "y800")
 
-    # Add your design elements here (text, lines, shapes, etc.)
-    # For example:
-    c.drawString(50, 750, "Invoice")
-    c.drawString(50, 730, "Date:")
-    c.drawString(120, 730, "XXXX-XX-XX")
-    c.drawString(50, 710, "Customer:")
-    c.drawString(120, 710, "Customer Name")
-    c.drawString(50, 690, "Address:")
-    c.drawString(120, 690, "Customer Address")
-    c.drawString(50, 670, "Email:")
-    c.drawString(120, 670, "customer@example.com")
-    c.drawString(50, 650, "Phone:")
-    c.drawString(120, 650, "123-456-7890")
-    c.drawString(50, 630, "Invoice #:")
-    c.drawString(120, 630, "123456")
-    c.drawString(50, 600, "Description")
-    c.drawString(300, 600, "Amount")
+# Functie om gegevens uit de JSON te laden
+def laad_json_bestand(bestandsnaam):
+    with open(bestandsnaam, "r") as json_bestand:
+        gegevens = json.load(json_bestand)
+    return gegevens
 
-    # Save the PDF
-    c.save()
+# Functie om een PDF-factuur te maken
+def maak_factuur():
+    # 0) Create document
+    fileName = "MyDoc.pdf"
+    documentTitle = "Document title!"
+    title = "Factuur"
 
-def remove_text(input_filename, output_filename):
-    input_pdf = PdfFileReader(open(input_filename, "rb"))
-    output_pdf = PdfFileWriter()
+    # Load JSON data
+    gegevens = laad_json_bestand("pdf-generator/2000-965.json")
 
-    # Remove text by creating a copy of each page
-    for page in range(input_pdf.getNumPages()):
-        page_obj = input_pdf.getPage(page)
-        page_obj.compressContentStreams()  # Compress content for easier removal (optional)
-        output_pdf.addPage(page_obj)
+    pdf = canvas.Canvas(fileName)
+    pdf.setTitle(documentTitle)
 
-    # Write the modified PDF to a file
-    with open(output_filename, "wb") as output_file:
-        output_pdf.write(output_file)
+    drawMyRuler(pdf)
 
-if __name__ == "__main__":
-    blank_invoice_filename = "blank_invoice.pdf"
-    filled_invoice_filename = "filled_invoice.pdf"
+    # 1) Title :: Set fonts
+    pdf.setFont("Helvetica-Bold", 36)
+    pdf.drawString(235, 750, title)
 
-    # Generate a blank invoice PDF
-    generate_blank_invoice(blank_invoice_filename)
+    # 3) Draw a line
+    pdf.line(40, 560, 550, 560)
+    pdf.line(40, 510, 550, 510)
+    pdf.line(40, 410, 550, 410)
+    pdf.line(40, 310, 550, 310)
+    pdf.line(40, 100, 550, 100)
 
-    # Remove text from the blank invoice PDF to create the filled invoice PDF
-    remove_text(blank_invoice_filename, filled_invoice_filename)
+    # 4) Required Text
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(400, 735, gegevens["order"]["klant"]["naam"])
+    pdf.drawString(400, 720, gegevens["order"]["klant"]["adres"])
+    pdf.drawString(400, 705, f"{gegevens['order']['klant']['postcode']} {gegevens['order']['klant']['stad']}")
+    pdf.drawString(400, 655, f"Factuurdatum: {gegevens['order']['orderdatum']}")
+    pdf.drawString(400, 595, f"Factuur-nr: {gegevens['order']['ordernummer']}")
 
-    print("Filled invoice PDF generated successfully.")
+    y_pos = 490  # Startpositie voor de productgegevens
+    for product in gegevens["order"]["producten"]:
+        pdf.drawString(80, y_pos, product["productnaam"])
+        pdf.drawString(250, y_pos, str(product["aantal"]))
+        pdf.drawString(350, y_pos, str(product["prijs_per_stuk_excl_btw"]))
+        pdf.drawString(450, y_pos, str(product["aantal"] * product["prijs_per_stuk_excl_btw"]))
+        y_pos -= 20  # Verplaats naar de volgende regel
+
+    subtotaal = sum(product["aantal"] * product["prijs_per_stuk_excl_btw"] for product in gegevens["order"]["producten"])
+    btw = subtotaal * 0.21  # 21% BTW
+    totaal = subtotaal + btw
+    pdf.drawString(350, 285, f"Subtotaal: {subtotaal:.2f}")
+    pdf.drawString(350, 265, f"BTW (21%): {btw:.2f}")
+    pdf.drawString(350, 245, f"Totaal: {totaal:.2f}")
+
+    # Sla de PDF op
+    pdf.save()
+
+# Roep de functie aan om de factuur te maken
+maak_factuur()

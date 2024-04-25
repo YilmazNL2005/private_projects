@@ -1,12 +1,4 @@
-# Opdracht
-
-# Maak (via een Python programma) 
-# een PDF die er net zo uit ziet als je ontwerp 
-# maar zonder data (dus factuurregels en bedragen).
-
-
-
-
+import json
 
 # Help
 def drawMyRuler(pdf):
@@ -29,10 +21,15 @@ def drawMyRuler(pdf):
 
 # 0) Create document
 
-fileName = "MyDoc.pdf"
+fileName = "Factuur_Yilmaz.pdf"
 documentTitle = "Document title!"
 title = "Factuur"
 subTitle = "The largest carnivorous marsupial"
+
+def laad_json_bestand(bestandsnaam):
+    with open(bestandsnaam, "r") as json_bestand:
+        gegevens = json.load(json_bestand)
+    return gegevens
 # invoering = input("Voer wat in")
 
 
@@ -68,7 +65,7 @@ bedrijfsgegevens = [
 kosten = [
     "Subtotaal:",
     "Verzending:",
-    "BTW(21%):"
+    "BTW(21%):",
     "Totaal:"
 ]
 
@@ -150,6 +147,28 @@ pdf.drawString(80, 165, factuuradres[1])
 pdf.drawString(80, 145, factuuradres[2])
 pdf.drawString(80, 125, factuuradres[3])
 
+# Kosten
+pdf.drawString(350, 285, kosten[0])
+pdf.drawString(350, 265, kosten[1])
+pdf.drawString(350, 245, kosten[2])
+pdf.drawString(350, 225, kosten[3])
+
+gegevens = laad_json_bestand("pdf-generator/2000-965.json")
+
+y_pos = 490  # Startpositie voor de productgegevens
+for product in gegevens["order"]["producten"]:
+    pdf.drawString(80, y_pos, product["productnaam"])
+    pdf.drawString(250, y_pos, str(product["aantal"]))
+    pdf.drawString(350, y_pos, str(product["prijs_per_stuk_excl_btw"]))
+    pdf.drawString(450, y_pos, str(product["aantal"] * product["prijs_per_stuk_excl_btw"]))
+    y_pos -= 20  # Verplaats naar de volgende regel
+
+subtotaal = sum(product["aantal"] * product["prijs_per_stuk_excl_btw"] for product in gegevens["order"]["producten"])
+btw = subtotaal * 0.21  # 21% BTW
+totaal = subtotaal + btw
+pdf.drawString(350, 285, f"Subtotaal: {subtotaal:.2f}")
+pdf.drawString(350, 265, f"BTW (21%): {btw:.2f}")
+pdf.drawString(350, 245, f"Totaal: {totaal:.2f}")
 
 # Klantenservice
 pdf.drawString(80, 80, bedrijfsgegevens[0])
@@ -161,6 +180,12 @@ pdf.drawString(80, 20, bedrijfsgegevens[3])
 pdf.drawString(450, 80, bedrijfsgegevens[4])
 pdf.drawString(450, 60, bedrijfsgegevens[5])
 pdf.drawString(450, 40, bedrijfsgegevens[6])
+
+
+
+
+
+
 
 ###############
 
