@@ -69,9 +69,7 @@ kosten = [
     "Totaal:"
 ]
 
-zin = """Dit is een zin in de factuur.
-        Hopelijk is het leuk
-"""
+
 artikelomschrijving = "Artikelomschrijving"
 aantal = "Aantal"
 prijs = "Prijs"
@@ -106,11 +104,12 @@ pdf.drawString(235, 750, title)
 # pdf.setFont("Courier-Bold", 24)
 # pdf.drawCentredString(290, 720, subTitle)
 
+
 ##############################################
 # 3) Draw a line
 pdf.line(40, 560, 550, 560)
 pdf.line(40, 510, 550, 510)
-pdf.line(40, 410, 550, 410)
+# pdf.line(40, 410, 550, 410)
 pdf.line(40, 310, 550, 310)
 pdf.line(40, 100, 550, 100)
 
@@ -126,6 +125,7 @@ pdf.drawString(400, 595, textLines[4])
 
 pdf.setFont("Helvetica-Bold", 12)
 
+#############################################
 # Kopjes
 pdf.drawString(450, 530, totaalprijs)
 pdf.drawString(350, 530, prijs)
@@ -135,40 +135,47 @@ pdf.drawString(80, 530, artikelomschrijving)
 
 pdf.setFont("Helvetica-Bold", 10)
 
+##########################################
 # Factuuradres
 pdf.drawString(80, 285, factuuradres[0])
 pdf.drawString(80, 265, factuuradres[1])
 pdf.drawString(80, 245, factuuradres[2])
 pdf.drawString(80, 225, factuuradres[3])
 
+##########################################
 # Verzendadres
 pdf.drawString(80, 185, factuuradres[4])
 pdf.drawString(80, 165, factuuradres[1])
 pdf.drawString(80, 145, factuuradres[2])
 pdf.drawString(80, 125, factuuradres[3])
 
+##########################################
 # Kosten
-pdf.drawString(350, 285, kosten[0])
-pdf.drawString(350, 265, kosten[1])
-pdf.drawString(350, 245, kosten[2])
-pdf.drawString(350, 225, kosten[3])
+# pdf.drawString(350, 285, kosten[0])
+# pdf.drawString(350, 265, kosten[1])
+# pdf.drawString(350, 245, kosten[2])
+# pdf.drawString(350, 225, kosten[3])
 
 gegevens = laad_json_bestand("pdf-generator/2000-965.json")
 
-y_pos = 490  # Startpositie voor de productgegevens
+
+y_pos = 490  
 for product in gegevens["order"]["producten"]:
-    pdf.drawString(80, y_pos, product["productnaam"])
+    pdf.drawString(80, y_pos, str(product["productnaam"]))
     pdf.drawString(250, y_pos, str(product["aantal"]))
     pdf.drawString(350, y_pos, str(product["prijs_per_stuk_excl_btw"]))
     pdf.drawString(450, y_pos, str(product["aantal"] * product["prijs_per_stuk_excl_btw"]))
-    y_pos -= 20  # Verplaats naar de volgende regel
+    y_pos -= 20
 
+# BTW
 subtotaal = sum(product["aantal"] * product["prijs_per_stuk_excl_btw"] for product in gegevens["order"]["producten"])
-btw = subtotaal * 0.21  # 21% BTW
+btw = subtotaal * 0.21
+verzending = 6.95
 totaal = subtotaal + btw
 pdf.drawString(350, 285, f"Subtotaal: {subtotaal:.2f}")
 pdf.drawString(350, 265, f"BTW (21%): {btw:.2f}")
-pdf.drawString(350, 245, f"Totaal: {totaal:.2f}")
+pdf.drawString(350, 245, f"Verzending: {verzending:.2f}")
+pdf.drawString(350, 225, f"Totaal: {totaal:.2f}")
 
 # Klantenservice
 pdf.drawString(80, 80, bedrijfsgegevens[0])
