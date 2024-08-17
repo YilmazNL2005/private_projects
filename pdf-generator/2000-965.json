@@ -21,13 +21,25 @@
         "productnaam": "Oracle Cloud",
         "aantal": 5,
         "prijs_per_stuk_excl_btw": 214.75,
-        "btw_percentage": 6
+        "btw_percentage": 21
       },
       {
-        "productnaam": "Billy Bob",
+        "productnaam": "Citroen",
         "aantal": 5,
         "prijs_per_stuk_excl_btw": 200.50,
-        "btw_percentage": 6
+        "btw_percentage": 21
+      },
+      {
+        "productnaam": "Appeltaart",
+        "aantal": 1,
+        "prijs_per_stuk_excl_btw": 20.55,
+        "btw_percentage": 21
+      },
+      {
+        "productnaam": "Nike schoenen",
+        "aantal": 1,
+        "prijs_per_stuk_excl_btw": 20.55,
+        "btw_percentage": 21
       }
     ]
   }

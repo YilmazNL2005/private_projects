@@ -18,7 +18,6 @@ def drawMyRuler(pdf):
     pdf.drawString(10,800, "y800")
 
 
-
 # 0) Create document
 
 fileName = "Factuur_Yilmaz.pdf"
@@ -62,12 +61,12 @@ bedrijfsgegevens = [
     "KVK-nummer: 3336447"
 ]
 
-kosten = [
-    "Subtotaal:",
-    "Verzending:",
-    "BTW(21%):",
-    "Totaal:"
-]
+# kosten = [
+#     "Subtotaal:",
+#     "Verzending:",
+#     "BTW(21%):",
+#     "Totaal:"
+# ]
 
 
 artikelomschrijving = "Artikelomschrijving"
@@ -114,8 +113,8 @@ pdf.line(40, 310, 550, 310)
 pdf.line(40, 100, 550, 100)
 
 
+################################################
 # 4) Benodigde Tekst wat er standaard in staat.
-
 pdf.setFont("Helvetica-Bold", 10)
 pdf.drawString(400, 735, textLines[0])
 pdf.drawString(400, 720, textLines[1])
@@ -142,12 +141,14 @@ pdf.drawString(80, 265, factuuradres[1])
 pdf.drawString(80, 245, factuuradres[2])
 pdf.drawString(80, 225, factuuradres[3])
 
+
 ##########################################
 # Verzendadres
 pdf.drawString(80, 185, factuuradres[4])
 pdf.drawString(80, 165, factuuradres[1])
 pdf.drawString(80, 145, factuuradres[2])
 pdf.drawString(80, 125, factuuradres[3])
+
 
 ##########################################
 # Kosten
@@ -157,7 +158,10 @@ pdf.drawString(80, 125, factuuradres[3])
 # pdf.drawString(350, 225, kosten[3])
 
 gegevens = laad_json_bestand("pdf-generator/2000-965.json")
-
+# y_pos = 285
+# y_min = 20
+# for bestelling in gegevens["order"]:
+#     pdf.drawString(80, 185, )
 
 y_pos = 490  
 for product in gegevens["order"]["producten"]:
@@ -167,13 +171,16 @@ for product in gegevens["order"]["producten"]:
     pdf.drawString(450, y_pos, str(product["aantal"] * product["prijs_per_stuk_excl_btw"]))
     y_pos -= 20
 
+
+
 # BTW
 subtotaal = sum(product["aantal"] * product["prijs_per_stuk_excl_btw"] for product in gegevens["order"]["producten"])
-btw = subtotaal * 0.21
+btw_percentage = 19 # Dit is 21 procent
+btw = subtotaal * 0.19
 verzending = 6.95
 totaal = subtotaal + btw
 pdf.drawString(350, 285, f"Subtotaal: {subtotaal:.2f}")
-pdf.drawString(350, 265, f"BTW (21%): {btw:.2f}")
+pdf.drawString(350, 265, f"BTW {btw_percentage}%: {btw:.2f}")
 pdf.drawString(350, 245, f"Verzending: {verzending:.2f}")
 pdf.drawString(350, 225, f"Totaal: {totaal:.2f}")
 
